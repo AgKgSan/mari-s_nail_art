@@ -34,6 +34,12 @@ class MyTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
         ),
       ),
+      // validator: (value) {
+      //   if (value == null || value.isEmpty) {
+      //     return "enter $hintText";
+      //   }
+      //   return null;
+      // },
     );
   }
 }

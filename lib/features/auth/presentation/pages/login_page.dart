@@ -47,10 +47,11 @@ class _LoginPageState extends State<LoginPage> {
 
     if (mounted) {
       if (successLogin) {
-        final model = authProvider.loginModel;
+        // final model = authProvider.loginModel;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Login Success")));
+        context.go(AppRouter.home);
       } else {
         ScaffoldMessenger.of(
           context,
@@ -117,6 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 20),
                   authProvider.isLoading
                       ? const Center(
                           child: Padding(

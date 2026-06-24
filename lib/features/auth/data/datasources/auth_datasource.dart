@@ -5,4 +5,10 @@ abstract interface class AuthDatasource {
     required String email,
     required String password,
   });
+  bool hasToken();
+  Future<void> clearToken();
+
+  Future<void> forgotPassword(String email);
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp);
+  Future<void> resetPassword(String newPassword, String token);
 }

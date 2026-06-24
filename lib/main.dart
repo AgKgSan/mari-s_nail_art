@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:mari_nail_art/core/theme/dark_theme.dart';
 import 'package:mari_nail_art/core/theme/light_theme.dart';
-import 'package:mari_nail_art/features/auth/presentation/provider/auth_provider.dart';
 import 'package:mari_nail_art/init_app.dart';
 import 'package:mari_nail_art/routes/app_routes.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -42,7 +39,7 @@ class MyApp extends StatelessWidget {
             title: 'Flutter Demo',
             theme: LightTheme.lightTheme,
             darkTheme: DarkTheme.darkTheme,
-            routerConfig: AppRouter.router(Provider.of<AuthProvider>(context)),
+            routerConfig: AppRouter.router(),
           );
         },
       ),

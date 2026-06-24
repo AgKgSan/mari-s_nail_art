@@ -3,11 +3,15 @@ import 'package:go_router/go_router.dart';
 import 'package:mari_nail_art/core/theme/app_fonts.dart';
 import 'package:mari_nail_art/core/widgets/elevated_buttons.dart';
 import 'package:mari_nail_art/core/widgets/my_text_field.dart';
+import 'package:mari_nail_art/features/auth/presentation/provider/auth_provider.dart';
 import 'package:mari_nail_art/routes/app_routes.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class CreateNewPassword extends StatefulWidget {
-  const CreateNewPassword({super.key});
+  final String email;
+  final String otp;
+  const CreateNewPassword({super.key, required this.email, required this.otp});
 
   @override
   State<CreateNewPassword> createState() => _CreateNewPasswordState();
@@ -28,8 +32,52 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
     super.dispose();
   }
 
+  void _submitNewPassword() async {
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+
+    if (password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("All password fields are required")),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
+      return;
+    }
+
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.resetPassword(newPassword: password);
+
+    if (mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Password changed successfully! Please log in."),
+          ),
+        );
+        // Clean flow, pop until returning back to Login View
+        context.go(AppRouter.login);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              authProvider.errorMessage ?? "Failed to reset password",
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Create New Password", style: AppFonts.body2),
@@ -47,9 +95,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
               width: 300,
               child: Text("Please Create a new password for your account."),
             ),
-
             const SizedBox(height: 15),
-
             MyTextField(
               controller: passwordController,
               hintText: "Enter New Password",
@@ -65,9 +111,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
             MyTextField(
               controller: confirmPasswordController,
               hintText: "Confirm New Password",
@@ -85,15 +129,13 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
-
-            ElevatedButtons(
-              label: "Submit",
-              onPressed: () {
-                context.push(AppRouter.login);
-              },
-            ),
+            authProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ElevatedButtons(
+                    label: "Submit",
+                    onPressed: _submitNewPassword,
+                  ),
           ],
         ),
       ),

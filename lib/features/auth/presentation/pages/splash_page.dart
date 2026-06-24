@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' show read;
-
 import 'package:mari_nail_art/core/constants/app_contants.dart';
 import 'dart:math';
 
@@ -9,6 +7,7 @@ import 'package:mari_nail_art/core/theme/app_colors.dart';
 import 'package:mari_nail_art/features/auth/presentation/provider/auth_provider.dart';
 import 'package:mari_nail_art/routes/app_routes.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -38,14 +37,19 @@ class _SplashPageState extends State<SplashPage>
 
     _controller.forward();
 
-    _controller.addStatusListener((status) {
+    _controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
         if (mounted) {
-          context.go(
-            context.read<AuthProvider>().isAuthenticated
-                ? AppRouter.home
-                : AppRouter.login,
-          );
+          final pref = await SharedPreferences.getInstance();
+          final String? token = pref.getString('accessToken');
+          final bool isLoggedIn = token != null && token.isNotEmpty;
+          if (mounted) {
+            if (isLoggedIn) {
+              context.read<AuthProvider>().authenticated(true);
+            }
+
+            context.go(isLoggedIn ? AppRouter.home : AppRouter.login);
+          }
         }
       }
     });

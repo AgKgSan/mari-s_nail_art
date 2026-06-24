@@ -3,12 +3,15 @@ import 'package:mari_nail_art/core/theme/app_colors.dart';
 import 'package:pinput/pinput.dart';
 
 class PinputField extends StatelessWidget {
-  const PinputField({super.key});
+  final TextEditingController pinController;
+
+  const PinputField({super.key, required this.pinController});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Pinput(
+        controller: pinController,
         length: 6,
         keyboardType: TextInputType.number,
 

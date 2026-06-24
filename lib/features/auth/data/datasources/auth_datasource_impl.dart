@@ -48,4 +48,67 @@ class AuthDatasourceImpl implements AuthDatasource {
       throw ServerException(e.toString());
     }
   }
+
+  @override
+  bool hasToken() {
+    final accesstoken = pref.getString('accessToken');
+    final refreshtoken = pref.getString('refreshToken');
+    return accesstoken != null &&
+        refreshtoken != null &&
+        accesstoken.isNotEmpty &&
+        refreshtoken.isNotEmpty;
+  }
+
+  @override
+  Future<void> clearToken() async {
+    await pref.remove('accessToken');
+    await pref.remove('refreshToken');
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    final response = await http.post(
+      Uri.parse(AppConfigs.forgotPw),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final errorLog = jsonDecode(response.body);
+      throw Exception(errorLog['message'] ?? 'Forgot password request failed');
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
+    final response = await http.post(
+      Uri.parse(AppConfigs.verifyOtp),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'otp': otp}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      final errorLog = jsonDecode(response.body);
+      throw Exception(errorLog['message'] ?? 'OTP Verification failed');
+    }
+  }
+
+  @override
+  Future<void> resetPassword(String newPassword, String token) async {
+    final response = await http.post(
+      Uri.parse(AppConfigs.resetPw),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'newPassword': newPassword}),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final errorLog = jsonDecode(response.body);
+      throw Exception(errorLog['message'] ?? 'Reset password failed');
+    }
+  }
 }

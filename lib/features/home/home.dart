@@ -20,16 +20,16 @@ class Home extends StatelessWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              context.push(AppRouter.bookings);
+              context.go(AppRouter.bookings);
               break;
             case 1:
-              context.push(AppRouter.history);
+              context.go(AppRouter.history);
               break;
             case 2:
-              context.push(AppRouter.notifications);
+              context.go(AppRouter.notifications);
               break;
             case 3:
-              context.push(AppRouter.profile);
+              context.go(AppRouter.profile);
               break;
           }
         },

@@ -1,21 +1,21 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mari_nail_art/features/auth/presentation/pages/create_new_password.dart';
 import 'package:mari_nail_art/features/auth/presentation/pages/forgot_password.dart';
-
 import 'package:mari_nail_art/features/auth/presentation/pages/login_page.dart';
 import 'package:mari_nail_art/features/auth/presentation/pages/otp_page.dart';
 import 'package:mari_nail_art/features/auth/presentation/pages/splash_page.dart';
-import 'package:mari_nail_art/features/auth/presentation/provider/auth_provider.dart';
 import 'package:mari_nail_art/features/bookings/presentation/pages/booking.dart';
 import 'package:mari_nail_art/features/bookings/presentation/pages/view_details.dart';
 import 'package:mari_nail_art/features/bookings/presentation/pages/walk_in_form.dart';
 import 'package:mari_nail_art/features/history/presentation/pages/history.dart';
 import 'package:mari_nail_art/features/home/home.dart';
 import 'package:mari_nail_art/features/notifications/presentation/pages/notification.dart';
+import 'package:mari_nail_art/features/profile/presentation/pages/change_language_page.dart';
+import 'package:mari_nail_art/features/profile/presentation/pages/change_password_page.dart';
+import 'package:mari_nail_art/features/profile/presentation/pages/privacy_and_security.dart';
 import 'package:mari_nail_art/features/profile/presentation/pages/profile.dart';
+import 'package:mari_nail_art/features/profile/presentation/pages/term_and_conditions.dart';
 
 class AppRouter {
   AppRouter._();
@@ -26,6 +26,12 @@ class AppRouter {
   static const String otp = '/otp';
   static const String viewdetails = '/viewdetails';
   static const String createnewpasswrod = '/createnewpasswrod';
+  static const String changePassword = '/changePassword';
+  static const String changeLanguage = '/changeLanguage';
+
+  static const String termsandcondition = '/termsandcondition';
+  static const String privacyandsecurity = '/privacyandsecurity';
+
   static const String walkinform = '/walkinform';
   static const String home = '/home';
   static const String bookings = '/home/bookings';
@@ -33,33 +39,33 @@ class AppRouter {
   static const String notifications = '/home/notifications';
   static const String profile = '/home/profile';
 
-  static GoRouter router(AuthProvider authProvider) => GoRouter(
+  static GoRouter router() => GoRouter(
     initialLocation: splash,
 
-    refreshListenable: authProvider,
+    // refreshListenable: authProvider,
 
-    // app_routes.dart
-    redirect: (context, state) {
-      final location = state.matchedLocation;
-      final bool isLoggedIn = authProvider.isAuthenticated;
+    // // app_routes.dart
+    // redirect: (context, state) {
+    //   final location = state.matchedLocation;
+    //   final bool isLoggedIn = authProvider.isAuthenticated;
 
-      const publicRoutes = [login, forgot, otp, createnewpasswrod];
-      final isPublicRoute = publicRoutes.contains(location);
+    //   const publicRoutes = [login, forgot, otp, createnewpasswrod];
+    //   final isPublicRoute = publicRoutes.contains(location);
 
-      if (isLoggedIn && isPublicRoute) {
-        return home;
-      }
+    //   if (isLoggedIn && isPublicRoute) {
+    //     return home;
+    //   }
 
-      if (!isLoggedIn && !isPublicRoute) {
-        return login;
-      }
+    //   if (!isLoggedIn && !isPublicRoute) {
+    //     return login;
+    //   }
 
-      if (!isLoggedIn && isPublicRoute) {
-        return null;
-      }
+    //   if (!isLoggedIn && isPublicRoute) {
+    //     return null;
+    //   }
 
-      return null;
-    },
+    //   return null;
+    // },
     routes: [
       /// SPLASH
       GoRoute(path: splash, builder: (context, state) => const SplashPage()),
@@ -71,7 +77,25 @@ class AppRouter {
         path: viewdetails,
         builder: (context, state) => const ViewDetails(),
       ),
-      GoRoute(path: otp, builder: (context, state) => const OtpPage()),
+      GoRoute(
+        path: termsandcondition,
+        builder: (context, state) => const TermAndConditions(),
+      ),
+      GoRoute(
+        path: changeLanguage,
+        builder: (context, state) => const ChangeLanguagePage(),
+      ),
+      GoRoute(
+        path: privacyandsecurity,
+        builder: (context, state) => const PrivacyAndSecurity(),
+      ),
+      GoRoute(
+        path: otp,
+        builder: (context, state) {
+          final email = state.extra as String? ?? '';
+          return OtpPage(email: email);
+        },
+      ),
 
       GoRoute(
         path: walkinform,
@@ -79,7 +103,22 @@ class AppRouter {
       ),
       GoRoute(
         path: createnewpasswrod,
-        builder: (context, state) => const CreateNewPassword(),
+        builder: (context, state) {
+          final extra = state.extra;
+
+          if (extra is Map) {
+            return CreateNewPassword(
+              email: extra['email']?.toString() ?? '',
+              otp: extra['otp']?.toString() ?? '',
+            );
+          }
+
+          return const CreateNewPassword(email: '', otp: '');
+        },
+      ),
+      GoRoute(
+        path: changePassword,
+        builder: (context, state) => const ChangePasswordPage(),
       ),
 
       /// LOGIN (animation)
@@ -87,13 +126,14 @@ class AppRouter {
         path: login,
         pageBuilder: (context, state) {
           return CustomTransitionPage(
+            key: state.pageKey,
             transitionDuration: const Duration(milliseconds: 600),
             child: const LoginPage(),
             transitionsBuilder: (context, animation, _, child) {
               return SlideTransition(
                 position: animation.drive(
                   Tween(
-                    begin: const Offset(0, -1),
+                    begin: const Offset(0.0, -1.0),
                     end: Offset.zero,
                   ).chain(CurveTween(curve: Curves.easeOut)),
                 ),

@@ -1,9 +1,5 @@
-import 'dart:developer';
-
-import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:horizontal_weekly_calendar/weekly_calendar.dart';
 import 'package:mari_nail_art/core/theme/app_colors.dart';
 import 'package:mari_nail_art/core/theme/app_fonts.dart';
 import 'package:mari_nail_art/features/bookings/presentation/widgets/assigned_job_view.dart';
@@ -25,7 +21,18 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
 
   DateTime selectedDate = DateTime.now();
   DateTime now = DateTime.now();
-  DateTime? _selectedDate;
+
+  String getWidgetGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'Good Morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
 
   @override
   void initState() {
@@ -68,7 +75,7 @@ class _BookingState extends State<Booking> with SingleTickerProviderStateMixin {
               style2: AppFonts.text2,
               bgcolor: AppColors.headerBG,
               profile: AssetImage("assets/icons/UserCircle.png"),
-              nameAndGreeting: 'Good Morning',
+              nameAndGreeting: getWidgetGreeting(),
               nameAndPhone: 'Mg Mg',
             ),
 

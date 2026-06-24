@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mari_nail_art/core/theme/app_colors.dart';
 import 'package:mari_nail_art/core/theme/app_fonts.dart';
+import 'package:mari_nail_art/features/auth/presentation/provider/auth_provider.dart';
+import 'package:mari_nail_art/routes/app_routes.dart';
+import 'package:provider/provider.dart';
 
 class HeaderView extends StatelessWidget {
   final TextStyle style1;
@@ -57,6 +61,15 @@ class HeaderView extends StatelessWidget {
                 style: style2.copyWith(color: AppColors.primary),
               ),
             ],
+          ),
+          IconButton(
+            onPressed: () async {
+              await context.read<AuthProvider>().logout();
+              if (context.mounted) {
+                context.go(AppRouter.login);
+              }
+            },
+            icon: Icon(Icons.logout),
           ),
         ],
       ),

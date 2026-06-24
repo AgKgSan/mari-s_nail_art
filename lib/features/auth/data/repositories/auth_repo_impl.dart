@@ -22,4 +22,27 @@ class AuthRepoImpl implements AuthRepository {
       throw ServerException(e.toString());
     }
   }
+
+  @override
+  bool isAuthenticated() => authDatasource.hasToken();
+
+  @override
+  Future<void> logout() async {
+    await authDatasource.clearToken();
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    return await authDatasource.forgotPassword(email);
+  }
+
+  @override
+  Future<Map<String, dynamic>> verifyOtp(String email, String otp) async {
+    return await authDatasource.verifyOtp(email, otp);
+  }
+
+  @override
+  Future<void> resetPassword(String newPassword, String token) async {
+    return await authDatasource.resetPassword(newPassword, token);
+  }
 }
